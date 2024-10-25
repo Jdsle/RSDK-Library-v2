@@ -21,6 +21,10 @@
 #include <string.h>
 #include <cmath>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 // ================
 // STANDARD TYPES
 // ================

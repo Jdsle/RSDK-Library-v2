@@ -272,11 +272,19 @@ void RetroEngine::Run()
     unsigned long long targetFreq = SDL_GetPerformanceFrequency() / Engine.refreshRate;
     unsigned long long curTicks   = 0;
     
+#ifdef __EMSCRIPTEN__
+    if (running) {
+#else
     while (running) {
+#endif
 #if !RETRO_USE_ORIGINAL_CODE
         if (!vsync) {
             if (SDL_GetPerformanceCounter() < curTicks + targetFreq)
+#ifdef __EMSCRIPTEN__
+                return;
+#else
                 continue;
+#endif
             curTicks = SDL_GetPerformanceCounter();
         }
 #endif
@@ -307,6 +315,9 @@ void RetroEngine::Run()
         FlipScreen();
         frameStep  = false;
     }
+#ifdef __EMSCRIPTEN__
+    else {
+#endif
 
     ReleaseAudioDevice();
     ReleaseRenderDevice();
@@ -317,6 +328,9 @@ void RetroEngine::Run()
 
 #if RETRO_USING_SDL1 || RETRO_USING_SDL2
     SDL_Quit();
+#endif
+#ifdef __EMSCRIPTEN__
+    }
 #endif
 }
 
