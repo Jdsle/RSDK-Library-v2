@@ -261,6 +261,11 @@ void RetroEngine::Init()
         }
     }
 
+#ifdef __EMSCRIPTEN__
+    // shouldn't SDL_INIT_EVERYTHING cover this?
+    SDL_Init(SDL_INIT_GAMECONTROLLER);
+#endif
+
     // Calculate Skip frame
     int lower        = getLowerRate(targetRefreshRate, refreshRate);
     renderFrameIndex = targetRefreshRate / lower;
