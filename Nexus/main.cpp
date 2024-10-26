@@ -3,19 +3,17 @@
 #ifdef __EMSCRIPTEN__
 static bool looped = false;
 
-void LoopRSDK() {
-    Engine.Run();
-}
+void LoopRSDK() { Engine.Run(); }
 extern "C" {
-    EMSCRIPTEN_KEEPALIVE void RSDKInitialize()
-    {
-	    Engine.Init();
+EMSCRIPTEN_KEEPALIVE void RSDKInitialize()
+{
+	Engine.Init();
 
-	    if (!looped) {
-            looped = true;
-    	    emscripten_set_main_loop(LoopRSDK, false, true);
-    	}        
-    }
+	if (!looped) {
+        looped = true;
+    	emscripten_set_main_loop(LoopRSDK, false, true);
+    }        
+}
 }
 
 int main() { return 0; }
