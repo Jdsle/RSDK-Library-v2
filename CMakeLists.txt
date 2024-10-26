@@ -49,7 +49,7 @@ set(emsc_link_options
     -sUSE_VORBIS=1
     -sFORCE_FILESYSTEM=1
     -sELIMINATE_DUPLICATE_FUNCTIONS=1
-    -sEXPORTED_FUNCTIONS=['_main','_RSDKInitialize']
+    -sEXPORTED_FUNCTIONS=['_main','_RSDK_Initialize']
     -lm
     -lidbfs.js
     -sWASM=1

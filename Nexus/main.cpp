@@ -5,7 +5,7 @@ static bool looped = false;
 
 void LoopRSDK() { Engine.Run(); }
 extern "C" {
-EMSCRIPTEN_KEEPALIVE void RSDKInitialize()
+EMSCRIPTEN_KEEPALIVE void RSDK_Initialize()
 {
 	Engine.Init();
 
