@@ -27,6 +27,9 @@ Clone the repo, using:
 
 ## Compiling
 
+> [!NOTE]  
+> This fork does *not* run standalone! If you want to host your own build, you will need to also build the [RSDK-Library Engine Manager](https://github.com/Jdsle/RSDK), or develop your own interface.
+
 Compiling is as simple as typing the following in the root repository directory:
 ```
 emcmake -B build
