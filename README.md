@@ -16,6 +16,8 @@ Please note that the following instructions are for building this fork *only*. I
 
 This project uses [CMake](https://cmake.org/), a versatile building system that supports many different compilers and platforms. You can download CMake [here](https://cmake.org/download/). **(Make sure to enable the feature to add CMake to the system PATH during the installation!)**
 
+You will also need [Emscripten.](https://emscripten.org/docs/getting_started/downloads.html) Download and install it by following the provided instructions on the page.
+
 ## Get the source code
 
 In order to clone the repository, you need to install Git, which you can get [here](https://git-scm.com/downloads).
