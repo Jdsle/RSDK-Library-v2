@@ -349,5 +349,9 @@ void IniParser::Write(const char *filename, bool addPath)
     }
 
     fClose(f);
+
+#ifdef __EMSCRIPTEN__
+    SyncFS();
+#endif
 }
 #endif

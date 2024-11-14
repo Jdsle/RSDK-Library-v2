@@ -1,5 +1,23 @@
 #include "RetroEngine.hpp"
 
+#ifdef __EMSCRIPTEN__
+static bool looped = false;
+
+void LoopRSDK() { Engine.Run(); }
+extern "C" {
+EMSCRIPTEN_KEEPALIVE void RSDK_Initialize()
+{
+	Engine.Init();
+
+	if (!looped) {
+        looped = true;
+    	emscripten_set_main_loop(LoopRSDK, false, true);
+    }        
+}
+}
+
+int main() { return 0; }
+#else
 #if !RETRO_USE_ORIGINAL_CODE
 
 #if RETRO_PLATFORM == RETRO_WIN && _MSC_VER
@@ -66,3 +84,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+#endif

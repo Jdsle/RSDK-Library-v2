@@ -29,4 +29,8 @@ inline void SetGlobalVariableByName(const char *name, int value)
 void InitUserdata();
 void WriteSettings();
 
+#ifdef __EMSCRIPTEN__
+void SyncFS();
+#endif
+
 #endif //!USERDATA_H

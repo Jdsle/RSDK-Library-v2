@@ -9,7 +9,8 @@ bool engineDebugMode = false;
 
 RetroEngine Engine = RetroEngine();
 
-inline int getLowerRate(int intendRate, int targetRate) {
+inline int getLowerRate(int intendRate, int targetRate)
+{
     int result   = 0;
     int valStore = 0;
 
@@ -24,7 +25,8 @@ inline int getLowerRate(int intendRate, int targetRate) {
     return result;
 }
 
-bool processEvents() {
+bool processEvents()
+{
 #if RETRO_USING_SDL1 || RETRO_USING_SDL2
     while (SDL_PollEvent(&Engine.sdlEvents)) {
         // Main Events
@@ -59,7 +61,8 @@ bool processEvents() {
 #endif
 
                             Engine.GameMode = ENGINE_INITSYSMENU;
-                        } else {
+                        }
+                        else {
                             Engine.GameMode = ENGINE_EXITGAME;
                             return false;
                         }
@@ -71,7 +74,8 @@ bool processEvents() {
                             StageListPosition = 0;
                             StageMode         = STAGEMODE_LOAD;
                             Engine.GameMode   = ENGINE_MAINGAME;
-                        } else {
+                        }
+                        else {
                             Engine.GameRunning = false;
                         }
                         break;
@@ -120,7 +124,8 @@ bool processEvents() {
                             SDL_RestoreWindow(Engine.window);
                             SDL_SetWindowFullscreen(Engine.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 #endif
-                        } else {
+                        }
+                        else {
 #if RETRO_USING_SDL1
                             Engine.windowSurface =
                                 SDL_SetVideoMode(SCREEN_XSIZE * Engine.windowScale, SCREEN_YSIZE * Engine.windowScale, 16, SDL_SWSURFACE);
@@ -202,7 +207,8 @@ bool processEvents() {
     return true;
 }
 
-void RetroEngine::Init() {
+void RetroEngine::Init()
+{
     CalculateTrigAngles();
 #if !RETRO_USE_ORIGINAL_CODE
     InitUserdata();
@@ -230,18 +236,23 @@ void RetroEngine::Init() {
 #endif
     CheckBinFile(dest);
 
-    GameMode = ENGINE_EXITGAME;
-    GameRunning  = false;
+    GameMode    = ENGINE_EXITGAME;
+    GameRunning = false;
     if (LoadGameConfig("Data/Game/GameConfig.bin")) {
         if (InitRenderDevice()) {
             if (InitSoundDevice()) {
                 InitSystemMenu();
                 ClearScriptData();
                 initialised = true;
-                GameRunning     = true;
+                GameRunning = true;
             }
         }
     }
+
+#ifdef __EMSCRIPTEN__
+    // shouldn't SDL_INIT_EVERYTHING cover this?
+    SDL_Init(SDL_INIT_GAMECONTROLLER);
+#endif
 
     // Calculate Skip frame
     int lower        = getLowerRate(targetRefreshRate, refreshRate);
@@ -249,15 +260,24 @@ void RetroEngine::Init() {
     skipFrameIndex   = refreshRate / lower;
 }
 
-void RetroEngine::Run() {
+void RetroEngine::Run()
+{
     unsigned long long targetFreq = SDL_GetPerformanceFrequency() / Engine.refreshRate;
     unsigned long long curTicks   = 0;
 
+#ifdef __EMSCRIPTEN__
+    if (GameRunning) {
+#else
     while (GameRunning) {
+#endif
 #if !RETRO_USE_ORIGINAL_CODE
         if (!vsync) {
             if (SDL_GetPerformanceCounter() < curTicks + targetFreq)
+#ifdef __EMSCRIPTEN__
+                return;
+#else
                 continue;
+#endif
             curTicks = SDL_GetPerformanceCounter();
         }
 #endif
@@ -272,17 +292,13 @@ void RetroEngine::Run() {
                         ProcessSystemMenu();
                         FlipScreen();
                         break;
-                    case ENGINE_MAINGAME: 
-                        ProcessStage(); 
-                        break;
+                    case ENGINE_MAINGAME: ProcessStage(); break;
                     case ENGINE_INITSYSMENU:
                         LoadGameConfig("Data/Game/GameConfig.bin");
                         InitSystemMenu();
                         ResetCurrentStageFolder();
                         break;
-                    case ENGINE_EXITGAME: 
-                        GameRunning = false; 
-                        break;
+                    case ENGINE_EXITGAME: GameRunning = false; break;
                     default: break;
                 }
             }
@@ -290,20 +306,28 @@ void RetroEngine::Run() {
 
         frameStep = false;
     }
-
-    ReleaseSoundDevice();
-    ReleaseRenderDevice();
-    WriteSettings();
+#ifdef __EMSCRIPTEN__
+    else {
+#endif
+        ReleaseSoundDevice();
+        ReleaseRenderDevice();
+        WriteSettings();
 #if RETRO_USE_MOD_LOADER
-    SaveMods();
+        SaveMods();
 #endif
 
 #if RETRO_USING_SDL1 || RETRO_USING_SDL2
-    SDL_Quit();
+        SDL_Quit();
+#endif
+#ifdef __EMSCRIPTEN__
+        emscripten_cancel_main_loop();
+        EM_ASM(window.location.href = window.location.href.substring(0, window.location.href.lastIndexOf('/'))); 
+    }
 #endif
 }
 
-bool RetroEngine::LoadGameConfig(const char *filePath) {
+bool RetroEngine::LoadGameConfig(const char *filePath)
+{
     FileInfo info;
     byte fileBuffer  = 0;
     byte fileBuffer2 = 0;

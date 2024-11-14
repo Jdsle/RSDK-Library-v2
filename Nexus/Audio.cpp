@@ -49,6 +49,10 @@ SDL_AudioDeviceID audioDevice;
 
 int InitSoundDevice()
 {
+#ifdef __EMSCRIPTEN__
+    // shouldn't SDL_INIT_EVERYTHING cover this?
+    SDL_Init(SDL_INIT_AUDIO);
+#endif
     StopAllSfx(); //"init"
 #if RETRO_USING_SDL1 || RETRO_USING_SDL2
     SDL_AudioSpec want;
@@ -486,7 +490,11 @@ bool PlayMusic(int track)
     }
     trackBuffer = track;
     musicStatus = MUSIC_LOADING;
+#ifdef __EMSCRIPTEN__
+    LoadMusic(NULL);
+#else
     SDL_CreateThread((SDL_ThreadFunction)LoadMusic, "LoadMusic", NULL);
+#endif
     UnlockAudioDevice();
     return true;
 }

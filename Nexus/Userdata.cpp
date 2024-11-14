@@ -333,3 +333,9 @@ void WriteSettings() {
 
     ini.Write(BASE_PATH"settings.ini");
 }
+
+#ifdef __EMSCRIPTEN__
+void SyncFS() {
+    EM_ASM(FS.syncfs(false,function (e){if(e)console.error(e);}););
+}
+#endif
